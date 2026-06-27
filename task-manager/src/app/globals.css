@@ -1,0 +1,12 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-priority-low: theme(colors.slate.500);
+  --color-priority-medium: theme(colors.amber.500);
+  --color-priority-high: theme(colors.red.500);
+  --color-status-todo: theme(colors.slate.500);
+  --color-status-in-progress: theme(colors.blue.500);
+  --color-status-done: theme(colors.green.500);
+}
