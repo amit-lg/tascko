@@ -3,7 +3,7 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { SafeUser } from "@/types/user";
 
-interface AuthState {
+export interface AuthState {
   user: SafeUser | null;
   token: string | null;
   isInitialised: boolean;

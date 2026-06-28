@@ -18,7 +18,11 @@ const config: Config = {
       testMatch: ["**/__tests__/components/**/*.test.tsx"],
       setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
       moduleNameMapper: { "^@/(.*)$": "<rootDir>/src/$1" },
-      transform: { "^.+\\.(t|j)sx?$": ["@swc/jest", {}] },
+      transform: {
+        "^.+\\.(t|j)sx?$": ["@swc/jest", {
+          jsc: { transform: { react: { runtime: "automatic" } } },
+        }],
+      },
     },
   ],
   coverageProvider: "v8",
