@@ -1,5 +1,7 @@
 # TaskCo
 
+**Live:** https://tascko-git-main-amits-projects-2c3b532e.vercel.app
+
 A personal task manager where you sign up, create projects, and add tasks under each project. Tasks have a status (todo / in progress / done) and a priority (low / medium / high). Each project shows a live progress bar based on how many of its tasks are marked done.
 
 That's the scope. There's no team collaboration, no shared projects, no notifications, and no real-time sync. Every project and task belongs to exactly one user.
