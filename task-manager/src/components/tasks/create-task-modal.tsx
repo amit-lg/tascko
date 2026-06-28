@@ -14,11 +14,15 @@ import { useState } from "react";
 const schema = z.object({
   title: z.string().min(1, "Title is required"),
   description: z.string().optional(),
-  priority: z.enum(["LOW", "MEDIUM", "HIGH"]).optional().or(z.literal("")).transform((v) => v || undefined),
+  priority: z
+    .string()
+    .optional()
+    .transform((v) => (v === "" || v === undefined ? undefined : (v as "LOW" | "MEDIUM" | "HIGH"))),
   dueDate: z.string().optional(),
 });
 
-type FormData = z.infer<typeof schema>;
+type FormData = z.input<typeof schema>;
+type FormOutput = z.output<typeof schema>;
 
 interface Props {
   open: boolean;
@@ -35,7 +39,7 @@ export default function CreateTaskModal({ open, onClose, projectId }: Props) {
   });
 
   const mutation = useMutation({
-    mutationFn: (data: FormData) =>
+    mutationFn: (data: FormOutput) =>
       taskService.create(projectId, {
         ...data,
         dueDate: data.dueDate ? new Date(data.dueDate).toISOString() : undefined,
@@ -58,7 +62,7 @@ export default function CreateTaskModal({ open, onClose, projectId }: Props) {
 
   return (
     <Modal open={open} onClose={handleClose} title="New Task">
-      <form onSubmit={handleSubmit((d) => { setServerError(""); mutation.mutate(d); })} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit((d) => { setServerError(""); mutation.mutate(d as FormOutput); })} className="flex flex-col gap-4">
         <Input label="Title" placeholder="What needs to be done?" error={errors.title?.message} {...register("title")} />
         <Input label="Description" placeholder="Optional details" error={errors.description?.message} {...register("description")} />
         <Select
