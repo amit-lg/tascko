@@ -47,5 +47,13 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
 
   const token = signToken({ userId: user.id });
 
-  return NextResponse.json<AuthResponse>({ user: safeUser, token }, { status: 201 });
+  const response = NextResponse.json<AuthResponse>({ user: safeUser, token }, { status: 201 });
+  response.cookies.set("token", token, {
+    httpOnly: true,
+    sameSite: "lax",
+    path: "/",
+    maxAge: 60 * 60 * 24 * 7,
+    secure: process.env.NODE_ENV === "production",
+  });
+  return response;
 }

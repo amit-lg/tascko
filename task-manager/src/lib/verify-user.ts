@@ -9,6 +9,10 @@ export type AuthedHandler = (
 ) => Promise<NextResponse>;
 
 function extractToken(req: NextRequest): string | null {
+  // Prefer httpOnly cookie (browser requests); fall back to Bearer header (curl/tests)
+  const cookie = req.cookies.get("token")?.value;
+  if (cookie && cookie.length > 0) return cookie;
+
   const header = req.headers.get("authorization");
   if (!header || !header.startsWith("Bearer ")) return null;
   const token = header.slice(7).trim();
