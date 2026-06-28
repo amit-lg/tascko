@@ -14,7 +14,7 @@ export function middleware(request: NextRequest) {
 
   if (!isPublic && !token) {
     const loginUrl = new URL("/login", request.url);
-    loginUrl.searchParams.set("next", pathname);
+    loginUrl.searchParams.set("redirectTo", pathname);
     return NextResponse.redirect(loginUrl);
   }
 

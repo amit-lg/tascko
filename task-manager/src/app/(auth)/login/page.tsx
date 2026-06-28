@@ -3,9 +3,9 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
 import { authService } from "@/services/auth-service";
 import { setCredentials } from "@/store/auth-slice";
 import { useAppDispatch } from "@/store/hooks";
@@ -20,8 +20,9 @@ const loginSchema = z.object({
 
 type LoginForm = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dispatch = useAppDispatch();
   const [serverError, setServerError] = useState("");
 
@@ -36,7 +37,8 @@ export default function LoginPage() {
     try {
       const res = await authService.login(data);
       dispatch(setCredentials(res));
-      router.push("/dashboard");
+      const redirectTo = searchParams.get("redirectTo");
+      router.push(redirectTo && redirectTo.startsWith("/") ? redirectTo : "/dashboard");
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { error?: { message?: string } } } })
@@ -46,6 +48,37 @@ export default function LoginPage() {
   };
 
   return (
+    <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
+      <Input
+        label="Email"
+        type="email"
+        placeholder="you@example.com"
+        error={errors.email?.message}
+        {...register("email")}
+      />
+      <Input
+        label="Password"
+        type="password"
+        placeholder="••••••••"
+        error={errors.password?.message}
+        {...register("password")}
+      />
+
+      {serverError && (
+        <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
+          {serverError}
+        </p>
+      )}
+
+      <Button type="submit" loading={isSubmitting} className="w-full mt-2">
+        Sign in
+      </Button>
+    </form>
+  );
+}
+
+export default function LoginPage() {
+  return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <Card className="w-full max-w-md shadow-sm">
         <div className="mb-6">
@@ -53,32 +86,9 @@ export default function LoginPage() {
           <p className="text-gray-600 text-sm mt-1">Sign in to your account</p>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-4">
-          <Input
-            label="Email"
-            type="email"
-            placeholder="you@example.com"
-            error={errors.email?.message}
-            {...register("email")}
-          />
-          <Input
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            error={errors.password?.message}
-            {...register("password")}
-          />
-
-          {serverError && (
-            <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-2">
-              {serverError}
-            </p>
-          )}
-
-          <Button type="submit" loading={isSubmitting} className="w-full mt-2">
-            Sign in
-          </Button>
-        </form>
+        <Suspense fallback={null}>
+          <LoginForm />
+        </Suspense>
 
         <p className="text-center text-sm text-gray-600 mt-4">
           Don&apos;t have an account?{" "}
